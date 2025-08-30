@@ -1,8 +1,13 @@
+import { Route, Routes } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import BlogPage from "./pages/BlogPage";
+
 const App = () => {
   return (
-    <div>
-      <h1 class="text-3xl font-bold underline">Hello Bhaskar</h1>
-    </div>
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/blog/:id" element={<BlogPage />} />
+    </Routes>
   );
 };
 
