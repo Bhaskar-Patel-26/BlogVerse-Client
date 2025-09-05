@@ -1,4 +1,5 @@
 import 'quill/dist/quill.snow.css';
+import {Toaster} from "react-hot-toast"
 
 import { Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
@@ -9,19 +10,24 @@ import Dashboard from "./pages/admin/Dashboard";
 import AddBlog from "./pages/admin/AddBlog";
 import ListBlog from "./pages/admin/ListBlog";
 import Comments from "./pages/admin/Comments";
+import { useAppContext } from './context/AppContext';
 
 const App = () => {
+  const { token } = useAppContext();
   return (
-    <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/blog/:id" element={<BlogPage />} />
-      <Route path="/admin" element={true ? <Layout /> : <Login />}>
-        <Route index element={<Dashboard />} />
-        <Route path="addBlog" element={<AddBlog />} />
-        <Route path="listBlogs" element={<ListBlog />} />
-        <Route path="comments" element={<Comments />} />
-      </Route>
-    </Routes>
+    <>
+      <Toaster />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/blog/:id" element={<BlogPage />} />
+        <Route path="/admin" element={token ? <Layout /> : <Login />}>
+          <Route index element={<Dashboard />} />
+          <Route path="addBlog" element={<AddBlog />} />
+          <Route path="listBlogs" element={<ListBlog />} />
+          <Route path="comments" element={<Comments />} />
+        </Route>
+      </Routes>
+    </>
   );
 };
 

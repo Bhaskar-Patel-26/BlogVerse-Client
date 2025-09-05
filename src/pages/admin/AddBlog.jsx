@@ -1,8 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { assets, blogCategories } from "../../assets/assets";
 import Quill from "quill";
+import { useAppContext } from "../../context/AppContext";
+import toast from "react-hot-toast";
 
 const AddBlog = () => {
+  const { axios } = useAppContext();
+  const [isAdding, setIsAdding] = useState(false);
+
   const editorRef = useRef(null);
   const quillRef = useRef(null);
 
@@ -12,8 +17,41 @@ const AddBlog = () => {
   const [category, setCategory] = useState("Startup");
   const [isPublished, setIsPublished] = useState(false);
 
-  const submithandler = (e) => {
+  const submithandler = async (e) => {
     e.preventDefault();
+    try {
+      setIsAdding(true);
+      const blog = {
+        title,
+        subTitle: subtitle,
+        description: quillRef.current.root.innerHTML,
+        category,
+        isPublished,
+      };
+
+      const formData = new FormData();
+      formData.append("blog", JSON.stringify(blog));
+      formData.append("image", image);
+
+      const { data } = await axios.post("/api/blogs/add", formData);
+      if (data.success) {
+        toast.success(data.message);
+        setImage(false);
+        setTitle("");
+        setSubtitle("");
+        setCategory("Startup");
+        setIsPublished(false);
+        setIsAdding(false);
+        quillRef.current.root.innerHTML = "";
+      } else {
+        toast.error(data.message);
+        setIsAdding(false);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setIsAdding(false);
+    }
   };
 
   const generateContent = () => {
@@ -82,7 +120,7 @@ const AddBlog = () => {
             <input type="checkbox" checked={isPublished} onChange={(e) => setIsPublished(e.target.checked)} className="scale-125 cursor-pointer" />
         </div>
 
-        <button type="submit" className="bg-primary mt-8 h-10 w-40 text-white rounded hover:scale-105 transition-all cursor-pointer">Add Blog</button>
+        <button disabled={isAdding} type="submit" className="bg-primary mt-8 h-10 w-40 text-white rounded hover:scale-105 transition-all cursor-pointer">{isAdding ? "Adding..." : "Add Blog"}</button>
       </div>
     </form>
   );
